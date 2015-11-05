@@ -230,9 +230,6 @@
         // Render the month after year in the calendar title
         showMonthAfterYear: false,
 
-        // Render days of the calendar grid that fall in the next or previous month
-        showDaysInNextAndPreviousMonths: false,
-
         // how many months are visible
         numberOfMonths: 1,
 
@@ -277,14 +274,10 @@
 
     renderDay = function(opts)
     {
-        var arr = [];
         if (opts.isEmpty) {
-            if (opts.showDaysInNextAndPreviousMonths) {
-                arr.push('is-outside-current-month');
-            } else {
-                return '<td class="is-empty"></td>';
-            }
+            return '<td class="is-empty"></td>';
         }
+        var arr = [];
         if (opts.isDisabled) {
             arr.push('is-disabled');
         }
@@ -978,11 +971,6 @@
                     before += 7;
                 }
             }
-            var previousMonth = month === 0 ? 11 : month - 1,
-                nextMonth = month === 11 ? 0 : month + 1,
-                yearOfPreviousMonth = month === 0 ? year - 1 : year,
-                yearOfNextMonth = month === 11 ? year + 1 : year,
-                daysInPreviousMonth = getDaysInMonth(yearOfPreviousMonth, previousMonth);
             var cells = days + before,
                 after = cells;
             while(after > 7) {
@@ -995,41 +983,24 @@
                     isSelected = isDate(this._d) ? compareDates(day, this._d) : false,
                     isToday = compareDates(day, now),
                     isEmpty = i < before || i >= (days + before),
-                    dayNumber = 1 + (i - before),
-                    monthNumber = month,
-                    yearNumber = year,
                     isStartRange = opts.startRange && compareDates(opts.startRange, day),
                     isEndRange = opts.endRange && compareDates(opts.endRange, day),
                     isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange,
                     isDisabled = (opts.minDate && day < opts.minDate) ||
                                  (opts.maxDate && day > opts.maxDate) ||
                                  (opts.disableWeekends && isWeekend(day)) ||
-                                 (opts.disableDayFn && opts.disableDayFn(day));
-
-                if (isEmpty) {
-                    if (i < before) {
-                        dayNumber = daysInPreviousMonth + dayNumber;
-                        monthNumber = previousMonth;
-                        yearNumber = yearOfPreviousMonth;
-                    } else {
-                        dayNumber = dayNumber - days;
-                        monthNumber = nextMonth;
-                        yearNumber = yearOfNextMonth;
-                    }
-                }
-
-                var dayConfig = {
-                        day: dayNumber,
-                        month: monthNumber,
-                        year: yearNumber,
+                                 (opts.disableDayFn && opts.disableDayFn(day)),
+                    dayConfig = {
+                        day: 1 + (i - before),
+                        month: month,
+                        year: year,
                         isSelected: isSelected,
                         isToday: isToday,
                         isDisabled: isDisabled,
                         isEmpty: isEmpty,
                         isStartRange: isStartRange,
                         isEndRange: isEndRange,
-                        isInRange: isInRange,
-                        showDaysInNextAndPreviousMonths: opts.showDaysInNextAndPreviousMonths
+                        isInRange: isInRange
                     };
 
                 row.push(renderDay(dayConfig));
